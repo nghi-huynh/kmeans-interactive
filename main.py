@@ -162,7 +162,7 @@ class KmeansInteractive:
             for i in range(self.nb_centroids):
                 self.new_centroids[i, :] = self.X[np.where(self.classes == i)[0], :].mean(axis=0)
                 self.ax.plot([self.centroids[i, 0], self.new_centroids[i,0]], [self.centroids[i, 1], self.new_centroids[i,1]],
-                             c="black")
+                             c="black", linewidth=2)
                 self._clear_axis()
 
             self.centroids = self.new_centroids
