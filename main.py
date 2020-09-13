@@ -37,15 +37,32 @@ class KmeansInteractive:
         self.left_frame.grid(row=0, column=0)
 
         # Kmeans step frame
-        self.km_label = tk.Label(self.left_frame, text="K-means Steps", bg="red", 
+        self.km_label = tk.Label(self.left_frame, text="K-means Steps", bg="#D8EEED", 
                                  font=("Helvetica", int(screen_height/60), "bold"))
         self.km_label.place(relx=0, rely=0.05, relheight=0.05, relwidth=1)
 
-        self.km_previous_button = tk.Button(self.left_frame, text="PREVIOUS")
-        self.km_previous_button.place(relx=0.1, rely=0.1, relheight=0.05, relwidth=0.4)
-
         self.km_next_button = tk.Button(self.left_frame, text="NEXT")
-        self.km_next_button.place(relx=0.5, rely=0.1, relheight=0.05, relwidth=0.4)
+        self.km_next_button.place(relx=0.3, rely=0.1, relheight=0.05, relwidth=0.4)
+
+        # New sample
+        self.centroids_label = tk.Label(self.left_frame, text="Number of centroids :", bg="#D8EEED", anchor="se")
+        self.centroids_label.place(relx=0.05, rely=0.3, relheight=0.03, relwidth=0.6)
+
+        values_centroid = [2, 3, 4, 5]
+        self.centroids_cb = ttk.Combobox(self.left_frame, values=values_centroid)
+        self.centroids_cb.current(1)
+        self.centroids_cb.place(relx=0.70, rely=0.3, relheight=0.03, relwidth=0.15)
+
+        self.clusters_label = tk.Label(self.left_frame, text="Number of clusters :", bg="#D8EEED", anchor="se")
+        self.clusters_label.place(relx=0.05, rely=0.33, relheight=0.03, relwidth=0.6)
+
+        values_cluster = [2, 3, 4, 5]
+        self.clusters_cb = ttk.Combobox(self.left_frame, values=values_cluster)
+        self.clusters_cb.current(1)
+        self.clusters_cb.place(relx=0.7, rely=0.33, relheight=0.03, relwidth=0.15)
+
+        self.newsample_button = tk.Button(self.left_frame, text="NEW SAMPLE")
+        self.newsample_button.place(relx=0.2, rely=0.37, relheight=0.05, relwidth=0.6)
 
         # Clear Button
         self.clear_button = tk.Button(self.left_frame, text="CLEAR")
