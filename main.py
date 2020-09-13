@@ -2,14 +2,22 @@ import numpy as np
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
+from random import sample
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+from sklearn.datasets import make_blobs
 
 class KmeansInteractive:
-    
+    """ Interactive K-means """
+
+    COLORS = ["firebrick", "mediumpurple", "forestgreen", "lightsalmon", "gray"]
+
     def __init__(self):
         
         self.master = tk.Tk()
+        
+        # Kmeans step
+        self.km_step = 1
 
         # Height and width
         screen_height = self.master.winfo_screenheight()
@@ -26,49 +34,183 @@ class KmeansInteractive:
         # Matplotlib Canvas
         self.figure = Figure(figsize=((3*self.WIDTH/4)/102, (self.HEIGHT)/102))
         self.ax = self.figure.add_subplot(1,1,1)
-        self.ax.axis("off")
         self.canvas = FigureCanvasTkAgg(self.figure, self.master)
         self.canvas.get_tk_widget().configure(highlightbackground="black", highlightthickness=2)
         self.canvas.get_tk_widget().grid(row=0, column=1)
-        self.figure.tight_layout()
 
         # Left frame
         self.left_frame = tk.Frame(self.master, height=self.HEIGHT, width=self.WIDTH/4, bg="#D8EEED")
         self.left_frame.grid(row=0, column=0)
 
-        # Kmeans step frame
-        self.km_label = tk.Label(self.left_frame, text="K-means Steps", bg="#D8EEED", 
-                                 font=("Helvetica", int(screen_height/60), "bold"))
-        self.km_label.place(relx=0, rely=0.05, relheight=0.05, relwidth=1)
-
-        self.km_next_button = tk.Button(self.left_frame, text="NEXT")
-        self.km_next_button.place(relx=0.3, rely=0.1, relheight=0.05, relwidth=0.4)
-
         # New sample
-        self.centroids_label = tk.Label(self.left_frame, text="Number of centroids :", bg="#D8EEED", anchor="se")
-        self.centroids_label.place(relx=0.05, rely=0.3, relheight=0.03, relwidth=0.6)
-
-        values_centroid = [2, 3, 4, 5]
-        self.centroids_cb = ttk.Combobox(self.left_frame, values=values_centroid)
-        self.centroids_cb.current(1)
-        self.centroids_cb.place(relx=0.70, rely=0.3, relheight=0.03, relwidth=0.15)
-
         self.clusters_label = tk.Label(self.left_frame, text="Number of clusters :", bg="#D8EEED", anchor="se")
-        self.clusters_label.place(relx=0.05, rely=0.33, relheight=0.03, relwidth=0.6)
+        self.clusters_label.place(relx=0.05, rely=0.05, relheight=0.03, relwidth=0.6)
 
         values_cluster = [2, 3, 4, 5]
         self.clusters_cb = ttk.Combobox(self.left_frame, values=values_cluster)
         self.clusters_cb.current(1)
-        self.clusters_cb.place(relx=0.7, rely=0.33, relheight=0.03, relwidth=0.15)
+        self.clusters_cb.place(relx=0.7, rely=0.05, relheight=0.03, relwidth=0.15)
 
-        self.newsample_button = tk.Button(self.left_frame, text="NEW SAMPLE")
-        self.newsample_button.place(relx=0.2, rely=0.37, relheight=0.05, relwidth=0.6)
+        self.newsample_button = tk.Button(self.left_frame, text="NEW SAMPLE", command=self.new_sample)
+        self.newsample_button.place(relx=0.2, rely=0.09, relheight=0.05, relwidth=0.6)
+
+        # Initialisation centroid
+        self.centroids_label = tk.Label(self.left_frame, text="Number of centroids :", bg="#D8EEED", anchor="se")
+        self.centroids_label.place(relx=0.05, rely=0.20, relheight=0.03, relwidth=0.6)
+
+        values_centroid = [2, 3, 4, 5]
+        self.centroids_cb = ttk.Combobox(self.left_frame, values=values_centroid)
+        self.centroids_cb.current(1)
+        self.centroids_cb.place(relx=0.70, rely=0.20, relheight=0.03, relwidth=0.15)
+
+        self.initcentroid_button = tk.Button(self.left_frame, text="INIT CENTROIDS", command=self.init_centroids)
+        self.initcentroid_button.place(relx=0.2, rely=0.24, relheight=0.05, relwidth=0.6)
+
+        # Kmeans step frame
+        self.km_label = tk.Label(self.left_frame, text="K-means Steps", bg="#D8EEED", 
+                                 font=("Helvetica", int(screen_height/60), "bold"))
+        self.km_label.place(relx=0, rely=0.50, relheight=0.05, relwidth=1)
+
+        self.km_next_button = tk.Button(self.left_frame, text="NEXT", state="disable", command=self.kmeans_step)
+        self.km_next_button.place(relx=0.3, rely=0.55, relheight=0.05, relwidth=0.4)
 
         # Clear Button
-        self.clear_button = tk.Button(self.left_frame, text="CLEAR")
+        self.clear_button = tk.Button(self.left_frame, text="CLEAR", command=self.clear_canvas)
         self.clear_button.place(relx=0.2, rely=0.9, relheight=0.05, relwidth=0.6)
 
+        # Randomize
+        self.new_sample()
         self.master.mainloop()
+
+    def new_sample(self):
+        """ Generate new sample """
+
+        self.n_samples = 100
+        nb_clusters = int(self.clusters_cb.get())
+
+        # enable centroids init
+        self.centroids_label.configure(state="normal")
+        self.centroids_cb.configure(state="normal")
+        self.initcentroid_button.configure(state="normal")
+
+        # dinable kmeans steps
+        self.km_next_button.configure(state="disable")
+
+        # randomize depending of clusters
+        if nb_clusters == 2:
+            self.X , _ = make_blobs(n_samples=100, centers=[(0,5), (5,0)], n_features=2)
+        elif nb_clusters == 3:
+            self.X , _ = make_blobs(n_samples=100, centers=[(3.5,0), (0,7), (7,7)], n_features=2)
+        elif nb_clusters == 4:
+            self.X , _ = make_blobs(n_samples=100, centers=[(0,0), (7,0), (0,7), (7,7)], n_features=2)
+        elif nb_clusters == 5:
+            self.X , _ = make_blobs(n_samples=100, centers=[(0,0), (9,0), (0,9), (9,9), (4.5,4.5)], n_features=2)
+
+        self.ax.clear()
+        self.ax.scatter(self.X[:, 0], self.X[:, 1], c="white", s=100, edgecolors="black")
+        self._clear_axis()
+
+    def clear_canvas(self):
+        """ Clear canvas """
+        
+        # disabled centroids init
+        self.centroids_label.configure(state="disabled")
+        self.centroids_cb.configure(state="disabled")
+        self.initcentroid_button.configure(state="disabled")
+
+        # dinable kmeans steps
+        self.km_next_button.configure(state="disable")
+        
+        # clear canvas
+        self.ax.clear()
+        self._clear_axis()
+
+    def init_centroids(self):
+        """ Centroids initialisation """
+
+        self.nb_centroids = int(self.centroids_cb.get())
+        self.idx_centroids = sample(range(self.n_samples), self.nb_centroids)
+        self.centroids = self.X[self.idx_centroids, :]
+        
+        # enable kmeans steps
+        self.km_next_button.configure(state="normal")
+
+        # plot
+        self.ax.clear()
+        self.ax.scatter(self.X[:, 0], self.X[:, 1], c="white", s=100, edgecolors="black")
+        self._plot_centroids()
+        self.km_step = 1
+
+    def kmeans_step(self):
+        """ A k-means step """
+
+        if self.km_step == 1:
+            # assign point to nearest centroid
+            self.distance_matrix = np.zeros((self.n_samples, self.nb_centroids))
+            
+            for j in range(self.nb_centroids):
+                for i in range(self.n_samples):
+                    self.distance_matrix[i,j] = self._euclidian_distance(self.centroids[j], self.X[i,:])
+            self.classes = np.argmin(self.distance_matrix, axis=1)
+            self._assign_points()
+            self.km_step = 2
+        
+        elif self.km_step == 2:
+            # update centroid
+            self.new_centroids = np.zeros((self.nb_centroids, 2))
+
+            for i in range(self.nb_centroids):
+                self.new_centroids[i, :] = self.X[np.where(self.classes == i)[0], :].mean(axis=0)
+                self.ax.plot([self.centroids[i, 0], self.new_centroids[i,0]], [self.centroids[i, 1], self.new_centroids[i,1]],
+                             c="black")
+                self._clear_axis()
+
+            self.centroids = self.new_centroids
+            self._plot_centroids()
+            self.km_step = 1
+
+    def _assign_points(self):
+        """ Assign points to nearest centroid and plot them """
+        
+        self.classes_color = list(self.classes)[:]
+        for i in range(self.nb_centroids):
+            self.classes_color = self._replace_list(self.classes_color, i, self.COLORS[i])
+
+        self.ax.clear()
+        self.ax.scatter(self.X[:, 0], self.X[:, 1], c=self.classes_color, s=100, edgecolors="black", linewidths=1)
+        self._plot_centroids()
+
+    def _plot_centroids(self):
+        """ Plot centroids """
+
+        centroids_color = self.COLORS[:self.nb_centroids]
+        self.ax.scatter(self.centroids[:, 0], self.centroids[:, 1], c="black", s=200, edgecolors=centroids_color,
+                        linewidths=4)
+        self._clear_axis()
+
+    @staticmethod
+    def _replace_list(l, old, new):
+        """ replace element in list """
+        
+        return [new if item == old else item for item in l]
+
+    @staticmethod
+    def _euclidian_distance(point1, point2):
+        """ Euclidian distance between point1 and point2 """
+
+        distance = 0
+        for i in range(len(point1)):
+            distance += (point1[i] - point2[i])**2
+        
+        return distance
+
+    def _clear_axis(self):
+        """ Clear axis and draw """
+
+        self.ax.axis("off")
+        self.ax.axis("equal")
+        self.figure.tight_layout()
+        self.canvas.draw()
 
 
 if __name__ == "__main__":
