@@ -74,6 +74,9 @@ class KmeansInteractive:
         self.km_next_button = tk.Button(self.left_frame, text="NEXT", state="disable", command=self.kmeans_step)
         self.km_next_button.place(relx=0.3, rely=0.55, relheight=0.05, relwidth=0.4)
 
+        # Inertia label (placed with _get_inertia func)
+        self.inertia_label = tk.Label(self.left_frame, font=("Helvetica", int(screen_height/80)), bg="#D8EEED")
+
         # Clear Button
         self.clear_button = tk.Button(self.left_frame, text="CLEAR", command=self.clear_canvas)
         self.clear_button.place(relx=0.2, rely=0.9, relheight=0.05, relwidth=0.6)
@@ -87,6 +90,9 @@ class KmeansInteractive:
 
         self.n_samples = 100
         nb_clusters = int(self.clusters_cb.get())
+
+        # hide inertia label
+        self.inertia_label.place_forget()
 
         # enable centroids init
         self.centroids_label.configure(state="normal")
@@ -112,7 +118,10 @@ class KmeansInteractive:
 
     def clear_canvas(self):
         """ Clear canvas """
-        
+
+        # hide inertia label
+        self.inertia_label.place_forget()
+
         # disabled centroids init
         self.centroids_label.configure(state="disabled")
         self.centroids_cb.configure(state="disabled")
@@ -131,6 +140,9 @@ class KmeansInteractive:
         self.nb_centroids = int(self.centroids_cb.get())
         self.idx_centroids = sample(range(self.n_samples), self.nb_centroids)
         self.centroids = self.X[self.idx_centroids, :]
+
+        # hide inertia label
+        self.inertia_label.place_forget()
         
         # enable kmeans steps
         self.km_next_button.configure(state="normal")
@@ -153,6 +165,7 @@ class KmeansInteractive:
                     self.distance_matrix[i,j] = self._euclidian_distance(self.centroids[j], self.X[i,:])
             self.classes = np.argmin(self.distance_matrix, axis=1)
             self._assign_points()
+            self._get_inertia()
             self.km_step = 2
         
         elif self.km_step == 2:
@@ -168,6 +181,20 @@ class KmeansInteractive:
             self.centroids = self.new_centroids
             self._plot_centroids()
             self.km_step = 1
+
+    def _get_inertia(self):
+        """ Calculation of inertia """
+        
+        self.inertia = 0
+
+        for j in range(self.nb_centroids):
+            ind_class_j = self.X[np.where(self.classes == j)[0], :]
+            for i in range(ind_class_j.shape[0]):
+                self.inertia += self._euclidian_distance(self.centroids[j], ind_class_j[i, :])
+        
+        self.inertia = round(self.inertia, 2)
+        self.inertia_label.config(text = "Inertia : {}".format(self.inertia))
+        self.inertia_label.place(relx=0, rely=0.61, relheight=0.04, relwidth=1)
 
     def _assign_points(self):
         """ Assign points to nearest centroid and plot them """
