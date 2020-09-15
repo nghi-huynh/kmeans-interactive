@@ -6,6 +6,7 @@ from random import sample
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 from sklearn.datasets import make_blobs
+from sklearn.preprocessing import StandardScaler
 
 class KmeansInteractive:
     """ Interactive K-means """
@@ -111,6 +112,9 @@ class KmeansInteractive:
             self.X , _ = make_blobs(n_samples=100, centers=[(0,0), (7,0), (0,7), (7,7)], n_features=2)
         elif nb_clusters == 5:
             self.X , _ = make_blobs(n_samples=100, centers=[(0,0), (9,0), (0,9), (9,9), (4.5,4.5)], n_features=2)
+
+        # Scaler
+        self.X = StandardScaler().fit_transform(self.X)
 
         self.ax.clear()
         self.ax.scatter(self.X[:, 0], self.X[:, 1], c="white", s=100, edgecolors="black")
