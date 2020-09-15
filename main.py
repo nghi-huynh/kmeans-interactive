@@ -152,7 +152,7 @@ class KmeansInteractive:
 
         # hide inertia label and init km_step_label
         self.inertia_label.place_forget()
-        self.km_step_label.config(text = "0. Centroids initialization")
+        self.km_step_label.config(text = "0. Centroids initialization", fg="black")
         self.km_step_label.place(relx=0.01, rely=0.965, relheight=0.03)
         
         # enable kmeans steps
@@ -177,7 +177,7 @@ class KmeansInteractive:
             self.classes = np.argmin(self.distance_matrix, axis=1)
             self._assign_points()
             self._get_inertia()
-            self.km_step_label.config(text = "1. Assign points to nearest centroids")
+            self.km_step_label.config(text = "1. Assign points to nearest centroids", fg="black")
             self.km_step_label.place(relx=0.01, rely=0.965, relheight=0.03)
             self.km_step = 2
         
@@ -194,12 +194,12 @@ class KmeansInteractive:
             # Check if kmeans converged
             if np.array_equal(self.new_centroids, self.centroids):
                 self.km_next_button.configure(state="disabled")
-                self.km_step_label.config(text = "K-means algorithm converged !")
+                self.km_step_label.config(text = "K-means algorithm converged !", fg="red")
                 self.km_step_label.place(relx=0.01, rely=0.965, relheight=0.03) 
             else:
                 self.centroids = self.new_centroids
                 self._plot_centroids()
-                self.km_step_label.config(text = "2. Update centroids to cluster means")
+                self.km_step_label.config(text = "2. Update centroids to cluster means", fg="black")
                 self.km_step_label.place(relx=0.01, rely=0.965, relheight=0.03)            
                 self.km_step = 1
 
