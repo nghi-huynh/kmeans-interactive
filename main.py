@@ -51,7 +51,7 @@ class KmeansInteractive:
         self.clusters_label.place(relx=0.05, rely=0.05, relheight=0.03, relwidth=0.6)
 
         values_cluster = [2, 3, 4, 5]
-        self.clusters_cb = ttk.Combobox(self.left_frame, values=values_cluster)
+        self.clusters_cb = ttk.Combobox(self.left_frame, values=values_cluster, state="readonly")
         self.clusters_cb.current(1)
         self.clusters_cb.place(relx=0.7, rely=0.05, relheight=0.03, relwidth=0.15)
 
@@ -63,7 +63,7 @@ class KmeansInteractive:
         self.centroids_label.place(relx=0.05, rely=0.20, relheight=0.03, relwidth=0.6)
 
         values_centroid = [2, 3, 4, 5]
-        self.centroids_cb = ttk.Combobox(self.left_frame, values=values_centroid)
+        self.centroids_cb = ttk.Combobox(self.left_frame, values=values_centroid, state="readonly")
         self.centroids_cb.current(1)
         self.centroids_cb.place(relx=0.70, rely=0.20, relheight=0.03, relwidth=0.15)
 
@@ -101,7 +101,7 @@ class KmeansInteractive:
 
         # enable centroids init
         self.centroids_label.configure(state="normal")
-        self.centroids_cb.configure(state="normal")
+        self.centroids_cb.configure(state="readonly")
         self.initcentroid_button.configure(state="normal")
 
         # dinable kmeans steps
