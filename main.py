@@ -21,13 +21,14 @@ class KmeansInteractive:
         self.km_step = 1
 
         # Height and width
-        screen_height = self.master.winfo_screenheight()
-        self.HEIGHT = int(screen_height * 0.7)
+        self.screen_height = self.master.winfo_screenheight()
+        self.screen_width = self.master.winfo_screenwidth()
+        self.HEIGHT = int(self.screen_height * 0.7)
         self.WIDTH = int((4/3) * self.HEIGHT)
 
         # Window customization : Title + geometry
         self.master.title("Interactive K-means")
-        self.master.geometry("{}x{}".format(self.WIDTH, self.HEIGHT))
+        self.master.geometry("{}x{}+{}+{}".format(self.WIDTH, self.HEIGHT, int((self.screen_width-self.WIDTH)/2), int((self.screen_height-self.HEIGHT)/2)))
         self.master.minsize(self.WIDTH, self.HEIGHT)
         self.master.maxsize(self.WIDTH, self.HEIGHT)
         self.master.config(bg="#D8EEED")       
@@ -40,7 +41,7 @@ class KmeansInteractive:
         self.canvas.get_tk_widget().grid(row=0, column=1)
 
         # Message k-means step (placed with kmeans_step() func)
-        self.km_step_label = tk.Label(self.canvas.get_tk_widget(), font=("Helvetica", int(screen_height/90)), bg="white")
+        self.km_step_label = tk.Label(self.canvas.get_tk_widget(), font=("Helvetica", int(self.screen_height/90)), bg="white")
 
         # Left frame
         self.left_frame = tk.Frame(self.master, height=self.HEIGHT, width=self.WIDTH/4, bg="#D8EEED")
@@ -72,14 +73,14 @@ class KmeansInteractive:
 
         # Kmeans step frame
         self.km_label = tk.Label(self.left_frame, text="K-means Steps", bg="#D8EEED", 
-                                 font=("Helvetica", int(screen_height/60), "bold"))
+                                 font=("Helvetica", int(self.screen_height/60), "bold"))
         self.km_label.place(relx=0, rely=0.50, relheight=0.05, relwidth=1)
 
         self.km_next_button = tk.Button(self.left_frame, text="NEXT", state="disable", command=self.kmeans_step)
         self.km_next_button.place(relx=0.3, rely=0.55, relheight=0.05, relwidth=0.4)
 
         # Inertia label (placed with _get_inertia func)
-        self.inertia_label = tk.Label(self.left_frame, font=("Helvetica", int(screen_height/80)), bg="#D8EEED")
+        self.inertia_label = tk.Label(self.left_frame, font=("Helvetica", int(self.screen_height/80)), bg="#D8EEED")
 
         # Clear Button
         self.clear_button = tk.Button(self.left_frame, text="CLEAR", command=self.clear_canvas)
