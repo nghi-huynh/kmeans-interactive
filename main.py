@@ -28,7 +28,7 @@ class KmeansInteractive:
 
         # Window customization : Title + geometry
         self.master.title("Interactive K-means")
-        self.master.geometry("{}x{}+{}+{}".format(self.WIDTH, self.HEIGHT, int((self.screen_width-self.WIDTH)/2), int((self.screen_height-self.HEIGHT)/2)))
+        self.master.geometry("{}x{}+{}+{}".format(self.WIDTH, self.HEIGHT, int((self.screen_width-self.WIDTH)/2), int((self.screen_height-2*self.HEIGHT)/2)))
         self.master.minsize(self.WIDTH, self.HEIGHT)
         self.master.maxsize(self.WIDTH, self.HEIGHT)
         self.master.config(bg="#D8EEED")       
